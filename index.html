@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Ajuda e Suporte Eleições Suplementar 2026</title>
+    <style>
+        /* Reset & base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #0b1a1e;
+            color: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            margin: 0;
+        }
+
+        /* Container principal – simula um app */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(145deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            border-radius: 40px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Splash Screen */
+        #splash {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            background: linear-gradient(145deg, #0f2027 0%, #1a3a44 60%, #1e4d5a 100%);
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+        }
+        #splash.hide {
+            opacity: 0;
+            transform: scale(1.02);
+            pointer-events: none;
+        }
+
+        .splash-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 8px 20px rgba(0, 200, 255, 0.25));
+        }
+
+        .splash-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 6px;
+        }
+        .splash-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            width: 60%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            border-radius: 4px;
+            transition: width 1.8s ease;
+        }
+
+        /* Main content */
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #main.visible {
+            opacity: 1;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #fff;
+            line-height: 1.2;
+        }
+        .header .sub-loc {
+            font-size: 14px;
+            color: #8bb8c9;
+            margin-top: 4px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .question {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            color: #eaf6fc;
+            margin: 6px 0 2px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .input-row .field {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #9bc1d0;
+            margin-bottom: 4px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            outline: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .field input:focus {
+            outline: 2px solid #3a9bd5;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .field input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+            font-weight: 400;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 40px;
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            box-shadow: 0 8px 24px rgba(0, 180, 219, 0.25);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 4px;
+        }
+        .btn-primary:hover {
+            transform: scale(1.01);
+            box-shadow: 0 12px 32px rgba(0, 180, 219, 0.35);
+        }
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        /* Result card */
+        #result {
+            margin-top: 16px;
+            flex-shrink: 0;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 20px 22px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            animation: fadeUp 0.4s ease;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .result-card .row:last-child {
+            border-bottom: none;
+        }
+        .result-card .label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #8bb8c9;
+            letter-spacing: 0.2px;
+        }
+        .result-card .value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+        .result-card .value.highlight {
+            color: #7fc9e6;
+        }
+
+        .result-card .agregada-msg {
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 3px solid #f5b342;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-top: 12px;
+            font-size: 14px;
+            color: #f5d98a;
+            font-weight: 500;
+        }
+
+        /* ---- DESTAQUE DO LOCAL DE VOTAÇÃO (ESCOLA) ---- */
+        .result-card .local-name {
+            font-size: 26px;
+            font-weight: 800;
+            text-align: center;
+            padding: 16px 10px 14px;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, #00c9a7, #00b4db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 200, 180, 0.3);
+            letter-spacing: -0.3px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(to right, #00c9a7, #00b4db) 1;
+            border-bottom-style: solid;
+            position: relative;
+        }
+        .result-card .local-name::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 20%;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00c9a7, #00b4db, transparent);
+            border-radius: 2px;
+            filter: blur(4px);
+            opacity: 0.7;
+        }
+        /* Efeito de brilho extra */
+        .result-card .local-name::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 40px;
+            background: radial-gradient(circle at 30% 30%, rgba(0, 200, 180, 0.15), transparent 70%);
+            z-index: -1;
+            filter: blur(10px);
+        }
+        /* Para garantir legibilidade no celular */
+        @media (max-width: 480px) {
+            .result-card .local-name {
+                font-size: 22px;
+                padding: 12px 8px 12px;
+                margin-bottom: 14px;
+            }
+        }
+
+        .not-found {
+            background: rgba(255, 70, 70, 0.08);
+            border: 1px solid rgba(255, 70, 70, 0.15);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            color: #f7a1a1;
+            font-weight: 500;
+        }
+
+        /* Ajustes mobile */
+        @media (max-width: 480px) {
+            .app-container {
+                border-radius: 28px;
+                padding: 20px 16px 28px;
+                min-height: 540px;
+            }
+            #splash {
+                border-radius: 28px;
+            }
+            .splash-title {
+                font-size: 19px;
+            }
+            .question {
+                font-size: 21px;
+            }
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .input-row .field {
+                min-width: unset;
+            }
+            .result-card {
+                padding: 16px 18px;
+            }
+            .btn-primary {
+                font-size: 16px;
+                padding: 14px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .mt-2 {
+            margin-top: 8px;
+        }
+
+        /* Rodapé com crédito */
+        .footer-credit {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.3px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 16px;
+            transition: color 0.2s;
+        }
+        .footer-credit:hover {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Ícone SVG */
+        .icon-urna {
+            fill: none;
+            stroke: white;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container" role="main">
+
+    <!-- SPLASH -->
+    <div id="splash">
+        <svg class="splash-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="30" width="60" height="45" rx="6" stroke="white" stroke-width="2.5" />
+            <rect x="30" y="38" width="40" height="6" rx="2" fill="white" opacity="0.8" />
+            <rect x="30" y="50" width="30" height="6" rx="2" fill="white" opacity="0.8" />
+            <path d="M48 75 L52 82 L58 75" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="50" cy="82" r="3" fill="white" />
+            <path d="M40 22 L45 28 L55 28 L60 22" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M35 22 L40 16 L60 16 L65 22" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <div class="splash-title">Ajuda e Suporte</div>
+        <div class="splash-title" style="font-size:18px; margin-top:-6px;">Eleições Suplementar 2026</div>
+        <div class="splash-sub">Baliza · RR</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div id="main">
+        <div class="header">
+            <h1>Ajuda e Suporte<br>Eleições Suplementar 2026</h1>
+            <div class="sub-loc">Roraima • São João da Baliza - RR</div>
+        </div>
+
+        <div class="question">Onde vou votar?</div>
+
+        <div class="form-group">
+            <div class="input-row">
+                <div class="field">
+                    <label for="zonaInput">Zona eleitoral</label>
+                    <input type="text" id="zonaInput" value="004" placeholder="Ex: 004">
+                </div>
+                <div class="field">
+                    <label for="secaoInput">Seção eleitoral</label>
+                    <input type="text" id="secaoInput" placeholder="Digite sua seção" autocomplete="off">
+                </div>
+            </div>
+            <button class="btn-primary" id="btnBuscar">Filtrar local de votação</button>
+        </div>
+
+        <div id="result">
+            <!-- resultado será renderizado aqui -->
+        </div>
+
+        <!-- Rodapé com crédito -->
+        <div class="footer-credit">Página criada por Edy Marques Freelancer</div>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ============================================================
+        // 1. DADOS EXTRAÍDOS DO PDF (totalmente fiéis)
+        // ============================================================
+        const dados = [
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 2,
+                secao_agregada: null,
+                eleitores: 206
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 5,
+                secao_agregada: null,
+                eleitores: 207
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 122,
+                secao_agregada: null,
+                eleitores: 207
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 6,
+                secao_agregada: null,
+                eleitores: 209
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 1,
+                secao_agregada: null,
+                eleitores: 208
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 110,
+                secao_agregada: null,
+                eleitores: 209
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "E.P.E. HENRIQUE DIAS",
+                bairro: "CENTRO",
+                endereco: "RUA MONTEIRO LOBATO, S/N, SEDE, TEL. 3235 1244",
+                secao: 129,
+                secao_agregada: null,
+                eleitores: 209
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL DARCY PEDROSO DA SILVA",
+                bairro: "INDUSTRIAL",
+                endereco: "RUA SÃO DOMINGOS, S/N, SEDE",
+                secao: 3,
+                secao_agregada: null,
+                eleitores: 259
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL DARCY PEDROSO DA SILVA",
+                bairro: "INDUSTRIAL",
+                endereco: "RUA SÃO DOMINGOS, S/N, SEDE",
+                secao: 9,
+                secao_agregada: null,
+                eleitores: 258
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL DARCY PEDROSO DA SILVA",
+                bairro: "INDUSTRIAL",
+                endereco: "RUA SÃO DOMINGOS, S/N, SEDE",
+                secao: 4,
+                secao_agregada: null,
+                eleitores: 261
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL DARCY PEDROSO DA SILVA",
+                bairro: "INDUSTRIAL",
+                endereco: "RUA SÃO DOMINGOS, S/N, SEDE",
+                secao: 140,
+                secao_agregada: null,
+                eleitores: 224
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL DARCY PEDROSO DA SILVA",
+                bairro: "INDUSTRIAL",
+                endereco: "RUA SÃO DOMINGOS, S/N, SEDE",
+                secao: 7,
+                secao_agregada: null,
+                eleitores: 254
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL DARCY PEDROSO DA SILVA",
+                bairro: "INDUSTRIAL",
+                endereco: "RUA SÃO DOMINGOS, S/N, SEDE",
+                secao: 8,
+                secao_agregada: null,
+                eleitores: 256
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA ESTADUAL FRANCISCO RICARDO DE MACEDO",
+                bairro: "MANOEL BEZERRA",
+                endereco: "RUA DEP. EDUARDO MAGALHAES, S/N, SEDE",
+                secao: 72,
+                secao_agregada: 137,
+                eleitores: 310
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA ESTADUAL FRANCISCO RICARDO DE MACEDO",
+                bairro: "MANOEL BEZERRA",
+                endereco: "RUA DEP. EDUARDO MAGALHAES, S/N, SEDE",
+                secao: 10,
+                secao_agregada: null,
+                eleitores: 258
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA ESTADUAL FRANCISCO RICARDO DE MACEDO",
+                bairro: "MANOEL BEZERRA",
+                endereco: "RUA DEP. EDUARDO MAGALHAES, S/N, SEDE",
+                secao: 93,
+                secao_agregada: null,
+                eleitores: 259
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA ESTADUAL FRANCISCO RICARDO DE MACEDO",
+                bairro: "MANOEL BEZERRA",
+                endereco: "RUA DEP. EDUARDO MAGALHAES, S/N, SEDE",
+                secao: 79,
+                secao_agregada: null,
+                eleitores: 259
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "ESCOLA MUNICIPAL CRISTOVÁO COLOMBO",
+                bairro: "RURAL",
+                endereco: "VICINAL 29, KM 15, S/N, INTERIOR",
+                secao: 61,
+                secao_agregada: 133,
+                eleitores: 292
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "SESC - SERVIÇO SOCIAL DO COMÉRCIO",
+                bairro: "UNIVERSO",
+                endereco: "AV. SÃO CRISTÓVÃO, S/N",
+                secao: 91,
+                secao_agregada: null,
+                eleitores: 248
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "SESC - SERVIÇO SOCIAL DO COMÉRCIO",
+                bairro: "UNIVERSO",
+                endereco: "AV. SÃO CRISTÓVÃO, S/N",
+                secao: 130,
+                secao_agregada: null,
+                eleitores: 213
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "SESC - SERVIÇO SOCIAL DO COMÉRCIO",
+                bairro: "UNIVERSO",
+                endereco: "AV. SÃO CRISTÓVÃO, S/N",
+                secao: 112,
+                secao_agregada: null,
+                eleitores: 173
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "SESC - SERVIÇO SOCIAL DO COMÉRCIO",
+                bairro: "UNIVERSO",
+                endereco: "AV. SÃO CRISTÓVÃO, S/N",
+                secao: 80,
+                secao_agregada: 136,
+                eleitores: 345
+            },
+            {
+                zona: 4,
+                municipio: "SÃO JOÃO DA BALIZA",
+                local: "SESC - SERVIÇO SOCIAL DO COMÉRCIO",
+                bairro: "UNIVERSO",
+                endereco: "AV. SÃO CRISTÓVÃO, S/N",
+                secao: 101,
+                secao_agregada: null,
+                eleitores: 232
+            }
+        ];
+
+        // ============================================================
+        // 2. REFERÊNCIAS DOM
+        // ============================================================
+        const splash = document.getElementById('splash');
+        const progressFill = document.getElementById('progressFill');
+        const main = document.getElementById('main');
+        const zonaInput = document.getElementById('zonaInput');
+        const secaoInput = document.getElementById('secaoInput');
+        const btnBuscar = document.getElementById('btnBuscar');
+        const resultDiv = document.getElementById('result');
+
+        // ============================================================
+        // 3. SPLASH
+        // ============================================================
+        function initSplash() {
+            // Anima barra
+            setTimeout(() => {
+                progressFill.style.width = '100%';
+            }, 100);
+
+            // Após 2s, esconde splash e mostra main
+            setTimeout(() => {
+                splash.classList.add('hide');
+                main.classList.add('visible');
+                // foco no campo seção
+                secaoInput.focus();
+            }, 2200);
+        }
+
+        // ============================================================
+        // 4. FUNÇÃO DE BUSCA
+        // ============================================================
+        function buscar() {
+            const zonaRaw = zonaInput.value.trim();
+            const secaoRaw = secaoInput.value.trim();
+
+            // Normaliza zona: permite 004, 04, 4
+            const zonaNum = parseInt(zonaRaw, 10);
+            if (isNaN(zonaNum) || zonaNum !== 4) {
+                // Se não for 4, ainda pode ser "004" -> parseInt dá 4
+                // Se for "004" -> 4, ok. Se for "04" -> 4. Se for "4" -> 4.
+                // Se for vazio ou outro, não entra.
+                if (zonaRaw !== '004' && zonaRaw !== '04' && zonaRaw !== '4') {
+                    resultDiv.innerHTML = `
+                        <div class="not-found">
+                            Zona inválida. Utilize a Zona 004.
+                        </div>
+                    `;
+                    return;
+                }
+            }
+
+            // Normaliza seção: remove zeros à esquerda e converte para número
+            const secaoNum = parseInt(secaoRaw, 10);
+            if (isNaN(secaoNum) || secaoRaw === '') {
+                resultDiv.innerHTML = `
+                    <div class="not-found">
+                        Por favor, digite o número da sua seção.
+                    </div>
+                `;
+                return;
+            }
+
+            // Buscar nos dados
+            let encontrado = null;
+            let isAgregada = false;
+            let secaoDigitada = secaoNum;
+
+            for (const reg of dados) {
+                // Confere zona (já validamos)
+                if (reg.zona !== 4) continue;
+
+                // Se a seção digitada é a seção principal
+                if (reg.secao === secaoNum) {
+                    encontrado = reg;
+                    isAgregada = false;
+                    break;
+                }
+                // Se a seção digitada é uma agregada
+                if (reg.secao_agregada !== null && reg.secao_agregada === secaoNum) {
+                    encontrado = reg;
+                    isAgregada = true;
+                    break;
+                }
+            }
+
+            if (!encontrado) {
+                resultDiv.innerHTML = `
+                    <div class="not-found">
+                        Não encontramos essa seção na Zona 004.<br>
+                        Confira se digitou corretamente.
+                    </div>
+                `;
+                return;
+            }
+
+            // ============================================================
+            // 5. RENDERIZAR CARD
+            // ============================================================
+            let html = `<div class="result-card">`;
+
+            // Local (agora com destaque máximo)
+            html += `<div class="local-name">${encontrado.local}</div>`;
+
+            // Bairro
+            html += `<div class="row"><span class="label">Bairro</span><span class="value">${encontrado.bairro}</span></div>`;
+
+            // Endereço
+            html += `<div class="row"><span class="label">Endereço</span><span class="value">${encontrado.endereco}</span></div>`;
+
+            // Município
+            html += `<div class="row"><span class="label">Município</span><span class="value">${encontrado.municipio}</span></div>`;
+
+            // Zona
+            html += `<div class="row"><span class="label">Zona eleitoral</span><span class="value">004</span></div>`;
+
+            // Seção digitada
+            html += `<div class="row"><span class="label">Seção digitada</span><span class="value">${secaoDigitada}</span></div>`;
+
+            // Seção principal
+            html += `<div class="row"><span class="label">Seção principal</span><span class="value">${encontrado.secao}</span></div>`;
+
+            // Seções agregadas (se houver)
+            if (encontrado.secao_agregada !== null) {
+                html += `<div class="row"><span class="label">Seções agregadas</span><span class="value">${encontrado.secao_agregada}</span></div>`;
+            } else {
+                html += `<div class="row"><span class="label">Seções agregadas</span><span class="value">—</span></div>`;
+            }
+
+            // Total de eleitores
+            html += `<div class="row"><span class="label">Total de eleitores</span><span class="value highlight">${encontrado.eleitores}</span></div>`;
+
+            // Mensagem se for agregada
+            if (isAgregada) {
+                html += `<div class="agregada-msg">✔ Sua seção aparece como seção agregada neste local de votação.</div>`;
+            }
+
+            html += `</div>`;
+
+            resultDiv.innerHTML = html;
+        }
+
+        // ============================================================
+        // 6. EVENTOS
+        // ============================================================
+        btnBuscar.addEventListener('click', buscar);
+
+        secaoInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscar();
+            }
+        });
+
+        // Opcional: Enter no campo zona também dispara (mas foco principal na seção)
+        zonaInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                secaoInput.focus();
+            }
+        });
+
+        // ============================================================
+        // 7. INICIALIZAÇÃO
+        // ============================================================
+        initSplash();
+
+    })();
+</script>
+</body>
+</html>
