@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Ajuda e Suporte Eleições Suplementar 2026</title>
+    <!-- PWA metas -->
+    <meta name="theme-color" content="#0f2027">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Suporte Eleição">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Suporte Eleição">
+    <link rel="manifest" id="manifest-link">
     <style>
         /* Reset & base */
         * {
@@ -301,7 +309,6 @@
             filter: blur(4px);
             opacity: 0.7;
         }
-        /* Efeito de brilho extra */
         .result-card .local-name::before {
             content: '';
             position: absolute;
@@ -311,7 +318,6 @@
             z-index: -1;
             filter: blur(10px);
         }
-        /* Para garantir legibilidade no celular */
         @media (max-width: 480px) {
             .result-card .local-name {
                 font-size: 22px;
@@ -386,6 +392,47 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
+        /* PWA: botão de instalação e mensagem iOS */
+        #install-container {
+            margin-top: 12px;
+            text-align: center;
+        }
+        #install-btn {
+            background: rgba(0, 200, 180, 0.15);
+            border: 1px solid rgba(0, 200, 180, 0.3);
+            color: #b2f0e8;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s, border-color 0.2s;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+        #install-btn:hover {
+            background: rgba(0, 200, 180, 0.25);
+            border-color: rgba(0, 200, 180, 0.5);
+        }
+        #install-btn.hidden {
+            display: none;
+        }
+        #ios-install-msg {
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }
+        #ios-install-msg.hidden {
+            display: none;
+        }
+
         /* Ícone SVG */
         .icon-urna {
             fill: none;
@@ -444,6 +491,12 @@
 
         <div id="result">
             <!-- resultado será renderizado aqui -->
+        </div>
+
+        <!-- PWA: instalador e mensagem iOS -->
+        <div id="install-container">
+            <button id="install-btn" class="hidden">Instalar aplicativo</button>
+            <div id="ios-install-msg" class="hidden">Para instalar no iPhone: toque em Compartilhar e depois em Adicionar à Tela de Início.</div>
         </div>
 
         <!-- Rodapé com crédito -->
@@ -707,16 +760,13 @@
         // 3. SPLASH
         // ============================================================
         function initSplash() {
-            // Anima barra
             setTimeout(() => {
                 progressFill.style.width = '100%';
             }, 100);
 
-            // Após 2s, esconde splash e mostra main
             setTimeout(() => {
                 splash.classList.add('hide');
                 main.classList.add('visible');
-                // foco no campo seção
                 secaoInput.focus();
             }, 2200);
         }
@@ -728,12 +778,8 @@
             const zonaRaw = zonaInput.value.trim();
             const secaoRaw = secaoInput.value.trim();
 
-            // Normaliza zona: permite 004, 04, 4
             const zonaNum = parseInt(zonaRaw, 10);
             if (isNaN(zonaNum) || zonaNum !== 4) {
-                // Se não for 4, ainda pode ser "004" -> parseInt dá 4
-                // Se for "004" -> 4, ok. Se for "04" -> 4. Se for "4" -> 4.
-                // Se for vazio ou outro, não entra.
                 if (zonaRaw !== '004' && zonaRaw !== '04' && zonaRaw !== '4') {
                     resultDiv.innerHTML = `
                         <div class="not-found">
@@ -744,7 +790,6 @@
                 }
             }
 
-            // Normaliza seção: remove zeros à esquerda e converte para número
             const secaoNum = parseInt(secaoRaw, 10);
             if (isNaN(secaoNum) || secaoRaw === '') {
                 resultDiv.innerHTML = `
@@ -755,22 +800,17 @@
                 return;
             }
 
-            // Buscar nos dados
             let encontrado = null;
             let isAgregada = false;
             let secaoDigitada = secaoNum;
 
             for (const reg of dados) {
-                // Confere zona (já validamos)
                 if (reg.zona !== 4) continue;
-
-                // Se a seção digitada é a seção principal
                 if (reg.secao === secaoNum) {
                     encontrado = reg;
                     isAgregada = false;
                     break;
                 }
-                // Se a seção digitada é uma agregada
                 if (reg.secao_agregada !== null && reg.secao_agregada === secaoNum) {
                     encontrado = reg;
                     isAgregada = true;
@@ -788,65 +828,38 @@
                 return;
             }
 
-            // ============================================================
-            // 5. RENDERIZAR CARD
-            // ============================================================
             let html = `<div class="result-card">`;
-
-            // Local (agora com destaque máximo)
             html += `<div class="local-name">${encontrado.local}</div>`;
-
-            // Bairro
             html += `<div class="row"><span class="label">Bairro</span><span class="value">${encontrado.bairro}</span></div>`;
-
-            // Endereço
             html += `<div class="row"><span class="label">Endereço</span><span class="value">${encontrado.endereco}</span></div>`;
-
-            // Município
             html += `<div class="row"><span class="label">Município</span><span class="value">${encontrado.municipio}</span></div>`;
-
-            // Zona
             html += `<div class="row"><span class="label">Zona eleitoral</span><span class="value">004</span></div>`;
-
-            // Seção digitada
             html += `<div class="row"><span class="label">Seção digitada</span><span class="value">${secaoDigitada}</span></div>`;
-
-            // Seção principal
             html += `<div class="row"><span class="label">Seção principal</span><span class="value">${encontrado.secao}</span></div>`;
-
-            // Seções agregadas (se houver)
             if (encontrado.secao_agregada !== null) {
                 html += `<div class="row"><span class="label">Seções agregadas</span><span class="value">${encontrado.secao_agregada}</span></div>`;
             } else {
                 html += `<div class="row"><span class="label">Seções agregadas</span><span class="value">—</span></div>`;
             }
-
-            // Total de eleitores
             html += `<div class="row"><span class="label">Total de eleitores</span><span class="value highlight">${encontrado.eleitores}</span></div>`;
-
-            // Mensagem se for agregada
             if (isAgregada) {
                 html += `<div class="agregada-msg">✔ Sua seção aparece como seção agregada neste local de votação.</div>`;
             }
-
             html += `</div>`;
 
             resultDiv.innerHTML = html;
         }
 
         // ============================================================
-        // 6. EVENTOS
+        // 5. EVENTOS
         // ============================================================
         btnBuscar.addEventListener('click', buscar);
-
         secaoInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 buscar();
             }
         });
-
-        // Opcional: Enter no campo zona também dispara (mas foco principal na seção)
         zonaInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -855,9 +868,185 @@
         });
 
         // ============================================================
-        // 7. INICIALIZAÇÃO
+        // 6. INICIALIZAÇÃO
         // ============================================================
         initSplash();
+
+        // ============================================================
+        // 7. PWA - Manifest e Service Worker (sem arquivos externos)
+        // ============================================================
+        (function setupPWA() {
+            // Gera ícones via canvas (192x192 e 512x512)
+            function generateIcon(size) {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                // Fundo gradiente
+                const grad = ctx.createLinearGradient(0, 0, size, size);
+                grad.addColorStop(0, '#0f2027');
+                grad.addColorStop(0.5, '#203a43');
+                grad.addColorStop(1, '#2c5364');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, size, size);
+
+                // Borda arredondada simulada (desenha um retângulo com bordas arredondadas)
+                const radius = size * 0.2;
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(size - radius, 0);
+                ctx.quadraticCurveTo(size, 0, size, radius);
+                ctx.lineTo(size, size - radius);
+                ctx.quadraticCurveTo(size, size, size - radius, size);
+                ctx.lineTo(radius, size);
+                ctx.quadraticCurveTo(0, size, 0, size - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.clip();
+
+                // Preencher com gradiente
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, size, size);
+
+                // Desenhar uma urna simplificada (símbolo)
+                const w = size * 0.6;
+                const h = size * 0.5;
+                const x = (size - w) / 2;
+                const y = (size - h) / 2 + size * 0.05;
+
+                ctx.strokeStyle = '#b2f0e8';
+                ctx.lineWidth = size * 0.04;
+                ctx.shadowColor = 'rgba(0, 200, 180, 0.4)';
+                ctx.shadowBlur = size * 0.1;
+
+                // Corpo da urna
+                ctx.strokeRect(x, y, w, h * 0.6);
+                // Tampa
+                ctx.beginPath();
+                ctx.moveTo(x - w * 0.1, y);
+                ctx.lineTo(x + w * 0.5, y - h * 0.2);
+                ctx.lineTo(x + w * 1.1, y);
+                ctx.stroke();
+
+                // Base
+                ctx.beginPath();
+                ctx.moveTo(x + w * 0.2, y + h * 0.6);
+                ctx.lineTo(x + w * 0.3, y + h * 0.8);
+                ctx.lineTo(x + w * 0.7, y + h * 0.8);
+                ctx.lineTo(x + w * 0.8, y + h * 0.6);
+                ctx.stroke();
+
+                // Letra "E" pequena
+                ctx.font = `bold ${size * 0.25}px sans-serif`;
+                ctx.fillStyle = '#b2f0e8';
+                ctx.shadowBlur = 0;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('E', size / 2, size / 2 + size * 0.02);
+
+                return canvas.toDataURL('image/png');
+            }
+
+            const icon192 = generateIcon(192);
+            const icon512 = generateIcon(512);
+
+            // Cria o manifest
+            const manifest = {
+                name: "Ajuda e Suporte Eleições Suplementar 2026",
+                short_name: "Suporte Eleição",
+                start_url: ".",
+                scope: ".",
+                display: "standalone",
+                orientation: "portrait",
+                background_color: "#0f2027",
+                theme_color: "#0f2027",
+                description: "Consulta de local de votação em São João da Baliza - RR",
+                icons: [
+                    { src: icon192, sizes: "192x192", type: "image/png", purpose: "any" },
+                    { src: icon512, sizes: "512x512", type: "image/png", purpose: "any" }
+                ]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            document.getElementById('manifest-link').href = manifestURL;
+
+            // Service Worker
+            const swCode = `
+                self.addEventListener('install', function(e) {
+                    e.waitUntil(
+                        caches.open('eleicao-cache-v1').then(function(cache) {
+                            return cache.addAll(['.', 'index.html']);
+                        })
+                    );
+                });
+                self.addEventListener('activate', function(e) {
+                    e.waitUntil(clients.claim());
+                });
+                self.addEventListener('fetch', function(e) {
+                    e.respondWith(
+                        caches.match(e.request).then(function(response) {
+                            return response || fetch(e.request);
+                        })
+                    );
+                });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(swBlob);
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(swURL)
+                    .then(() => console.log('Service Worker registrado'))
+                    .catch(() => console.log('SW registro falhou'));
+            }
+
+            // Botão de instalação
+            let deferredPrompt = null;
+            const installBtn = document.getElementById('install-btn');
+            const installContainer = document.getElementById('install-container');
+
+            window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.classList.remove('hidden');
+            });
+
+            installBtn.addEventListener('click', function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(function(choice) {
+                        if (choice.outcome === 'accepted') {
+                            installBtn.classList.add('hidden');
+                        } else {
+                            installBtn.classList.remove('hidden');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            });
+
+            window.addEventListener('appinstalled', function() {
+                installBtn.classList.add('hidden');
+            });
+
+            // Detecção iOS e mensagem
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.navigator.standalone === true;
+            const iosMsg = document.getElementById('ios-install-msg');
+
+            if (isIOS && !isStandalone) {
+                iosMsg.classList.remove('hidden');
+            } else {
+                iosMsg.classList.add('hidden');
+            }
+
+            // Se já estiver instalado, esconde botão
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                installBtn.classList.add('hidden');
+            }
+        })();
 
     })();
 </script>
